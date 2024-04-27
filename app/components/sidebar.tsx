@@ -1,17 +1,16 @@
-import { useEffect, useRef, useMemo } from "react";
+import { useEffect, useMemo, useRef } from "react";
 
 import styles from "./home.module.scss";
 
-import { IconButton } from "./button";
-import SettingsIcon from "../icons/settings.svg";
-import GithubIcon from "../icons/github.svg";
-import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
-import CloseIcon from "../icons/close.svg";
+import ChatGptIcon from "../icons/chatgpt.svg";
 import DeleteIcon from "../icons/delete.svg";
+import DragIcon from "../icons/drag.svg";
+import LightningIcon from "../icons/lightning.svg";
 import MaskIcon from "../icons/mask.svg";
 import PluginIcon from "../icons/plugin.svg";
-import DragIcon from "../icons/drag.svg";
+import SettingsIcon from "../icons/settings.svg";
+import { IconButton } from "./button";
 
 import Locale from "../locales";
 
@@ -23,12 +22,12 @@ import {
   MIN_SIDEBAR_WIDTH,
   NARROW_SIDEBAR_WIDTH,
   Path,
-  REPO_URL,
 } from "../constant";
 
-import { Link, useNavigate } from "react-router-dom";
-import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
+import { Link, useNavigate } from "react-router-dom";
+import { Mask } from "../store/mask";
+import { isIOS, useMobileScreen } from "../utils";
 import { showConfirm, showToast } from "./ui-lib";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
@@ -143,6 +142,13 @@ export function SideBar(props: { className?: string }) {
 
   useHotKey();
 
+  const startChat = (mask?: Mask) => {
+    setTimeout(() => {
+      chatStore.newSession(mask);
+      navigate(Path.Chat);
+    }, 10);
+  };
+
   return (
     <div
       className={`${styles.sidebar} ${props.className} ${
@@ -216,10 +222,20 @@ export function SideBar(props: { className?: string }) {
               <IconButton icon={<SettingsIcon />} shadow />
             </Link>
           </div>
-          <div className={styles["sidebar-action"]}>
+          {/* <div className={styles["sidebar-action"]}>
             <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
               <IconButton icon={<GithubIcon />} shadow />
             </a>
+          </div> */}
+          <div className={styles["sidebar-action"]}>
+            <IconButton
+              text={Locale.NewChat.Skip}
+              onClick={() => startChat()}
+              icon={<LightningIcon />}
+              type="primary"
+              shadow
+              className={styles["skip"]}
+            />
           </div>
         </div>
         <div>
