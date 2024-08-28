@@ -1,13 +1,11 @@
-import React, { useEffect, useRef, useMemo, useState, Fragment } from "react";
+import React, { Fragment, useEffect, useMemo, useRef, useState } from "react";
 
 import styles from "./home.module.scss";
 
 import { IconButton } from "./button";
 import SettingsIcon from "../icons/settings.svg";
-import GithubIcon from "../icons/github.svg";
 import ChatGptIcon from "../icons/chatgpt.svg";
 import AddIcon from "../icons/add.svg";
-import CloseIcon from "../icons/close.svg";
 import DeleteIcon from "../icons/delete.svg";
 import MaskIcon from "../icons/mask.svg";
 import DragIcon from "../icons/drag.svg";
@@ -24,13 +22,14 @@ import {
   NARROW_SIDEBAR_WIDTH,
   Path,
   PLUGINS,
-  REPO_URL,
 } from "../constant";
 
 import { Link, useNavigate } from "react-router-dom";
 import { isIOS, useMobileScreen } from "../utils";
 import dynamic from "next/dynamic";
-import { showConfirm, Selector } from "./ui-lib";
+import { Selector, showConfirm } from "./ui-lib";
+import LightningIcon from "@/app/icons/lightning.svg";
+import { Mask } from "@/app/store/mask";
 
 const ChatList = dynamic(async () => (await import("./chat-list")).ChatList, {
   loading: () => null,
@@ -128,6 +127,7 @@ export function useDragSideBar() {
     shouldNarrow,
   };
 }
+
 export function SideBarContainer(props: {
   children: React.ReactNode;
   onDragStart: (e: MouseEvent) => void;
@@ -218,6 +218,13 @@ export function SideBar(props: { className?: string }) {
   const config = useAppConfig();
   const chatStore = useChatStore();
 
+  const startChat = (mask?: Mask) => {
+    setTimeout(() => {
+      chatStore.newSession(mask);
+      navigate(Path.Chat);
+    }, 10);
+  };
+
   return (
     <SideBarContainer
       onDragStart={onDragStart}
@@ -305,13 +312,14 @@ export function SideBar(props: { className?: string }) {
               </Link>
             </div>
             <div className={styles["sidebar-action"]}>
-              <a href={REPO_URL} target="_blank" rel="noopener noreferrer">
-                <IconButton
-                  aria={Locale.Export.MessageFromChatGPT}
-                  icon={<GithubIcon />}
-                  shadow
-                />
-              </a>
+              <IconButton
+                text={Locale.NewChat.Skip}
+                onClick={() => startChat()}
+                icon={<LightningIcon />}
+                type="primary"
+                shadow
+                className={styles["skip"]}
+              />
             </div>
           </>
         }
